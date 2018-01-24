@@ -38,9 +38,19 @@ class             : "man"
 output            : papaja::apa6_pdf
 ---
 
-```{r include = FALSE}
+```{r libraries, include = FALSE}
 library("papaja")
 library(MOTE)
+##library source
+library(ggplot2)
+library(reshape)
+cleanup = theme(panel.grid.major = element_blank(), 
+                panel.grid.minor = element_blank(), 
+                panel.background = element_blank(), 
+                axis.line.x = element_line(color = "black"),
+                axis.line.y = element_line(color = "black"),
+                legend.key = element_rect(fill = "white"),
+                text = element_text(size = 13))
 ```
 ##Null Hypothesis Significance Testing
   Null hypothesis significance testing (NHST) has dominated the social sciences for the past century, and currently, a blend of the Fisher and Neyman-Pearson methods are taught and practiced in psychological research [@Gigerenzer2004]. However, the sole use of NHST can be inadequate in terms of statistical inference [@Kirk2003]. Statistical reform is slow, hindering growth in the use of effect sizes [@Fritz2012; @Fritz2013], confidence intervals, or even error bars on graphs [@Cumming2005; @Cumming2007]. While a detailed discussion of the criticisms of NHST is outside the scope of this article [@Loftus1996; @Kruschke2010; @Wagenmakers2007], we briefly discuss a few key issues to highlight the necessity of alternative means of estimation, namely effect sizes and their confidence intervals. The assumption of the truth of null hypotheses is erroneous, as they can be falsified with large enough sample sizes [@Cohen1990; @Tukey1991]. Two comparisons in the real world are always, to some degree, different. A continual increase in sample size will eventually lead to the rejection of the null hypothesis. As @Cohen1990 says, "if the null hypothesis is always false, what's the big deal about rejecting it?" (pg. 1308).
@@ -63,24 +73,22 @@ library(MOTE)
   
   Several previous studies have examined the interplay between bias, standard deviation, and standard error, mostly focusing on sample size and effect size as variables of interest. @Keselman1975 ran 1,000 simulations of ANOVAs and determined that $\omega^2$ estimates were closer to the population effect than both $\epsilon^2$ and $\eta^2$. $\omega^2$ has been advocated as the "nearly unbiased" estimator of the population effect, wherein $\omega^2$ has less bias than $\epsilon^2$, leaving $\eta^2$ as the most biased [@Grissom2005; @Matsumoto2011]. However, $\omega^2$ can be negatively (i.e. underestimate) biased, as originally found in @Carroll1975 and replicated in @OGrady1982. @Okada2013 extended these results by comparing all three effect sizes across sample size and mean variability by simulating 1,000,000 one-way fixed effect ANOVAs with four treatment levels. While Okada used 1,000,000 simulations, many researchers have concluded that far fewer simulations can achieve an adequate attenuation of sampling variability [@Fan2001; @Robey1992; @Skidmore2012].
   
-  Results from Okada (2013) revealed that, $\epsilon^2$, not $\omega^2$, held the least bias across *n*. $\omega^2$ did, however, outperform both $\epsilon^2$ and $\eta^2$ in standard error. $\eta^2$ did have the lowest standard deviation, but Okada notes that $\eta^2$ performed poorly considering both bias and standard error. Okada concluded with a firm cautionary warning that researchers should not use $\eta^2$, as it incorrectly overestimates the population effect across sample, inversely related to sample size. @Skidmore2012 also investigated the performance of these effect sizes, considering common statistical assumption violations like heterogeneity, and found similar results as previous simulation studies [@Okada2013; @Carroll1975; @Keselman1975]. Even though these studies have focused on slightly different facets of bias in one-way between-subjects ANOVA, a common theme has emerged. Even with bias decreasing as an additive function of both an increase in population effect size and sample size [@Maxwell2004], conclusions from these studies remain the same: $\eta^2$ should not be used. This conclusion is intriguing, largely because $\eta^2$ is readily presented among statistical software packages (e.g. SPSS, R, JASP) and continues to be the most commonly reported effect size for ANOVA type designs [@Lakens2013].
+  Results from @Okada2013 revealed that, $\epsilon^2$, not $\omega^2$, held the least bias across *n*. $\omega^2$ did, however, outperform both $\epsilon^2$ and $\eta^2$ in standard error. $\eta^2$ did have the lowest standard deviation, but Okada notes that $\eta^2$ performed poorly considering both bias and standard error. Okada concluded with a firm cautionary warning that researchers should not use $\eta^2$, as it incorrectly overestimates the population effect across sample, inversely related to sample size. @Skidmore2012 also investigated the performance of these effect sizes, considering common statistical assumption violations like heterogeneity, and found similar results as previous simulation studies [@Okada2013; @Carroll1975; @Keselman1975]. Even though these studies have focused on slightly different facets of bias in one-way between-subjects ANOVA, a common theme has emerged. Even with bias decreasing as an additive function of both an increase in population effect size and sample size [@Maxwell2004], conclusions from these studies remain the same: $\eta^2$ should not be used. This conclusion is intriguing, largely because $\eta^2$ is readily presented among statistical software packages (e.g. SPSS, R, JASP) and continues to be the most commonly reported effect size for ANOVA type designs [@Lakens2013].
 
 ##Purpose of Current Study
   The purpose of the current study is to examine these important conclusions regarding the use of $\eta^2$, as well as examining the type of data used in research design and its effects on the performance of $\eta^2$, $\epsilon^2$, and $\omega^2$. While former studies have investigated cases when ANOVA model assumptions hold true, we investigated the case when aspects do not hold true, which is often reflected in cases of real psychological data analysis.
-  
-  
   
 We first established empirical confidence intervals of bias, standard deviation, and standard error to use as a criterion for judging changes in these variables. Second, we examined the effect of data type on bias, standard deviation, and standard error. Last, for the data type manipulations that significantly change bias, standard deviation, or standard error, we calculated this change across a large range of effect sizes (i.e. nearly zero to very large). This analysis demonstrates the effect of the bias, standard deviation, or standard error change with more precision than previous work binning effect sizes into small, medium, or large magnitudes.
 
 # Method
 
 ## Simulations
-  To further the work by Okada (2013), it is first advantageous to explain the underlying assumptions and formulas used in this extension. While these formulas can be found in many introductory statistics textbooks covering ANOVA methods, we describe them below as well as provide *R* syntax online to aid in the reproducibility and understanding of the current extension. Population effect size is calculated by creating a sum of squares for between group differences from the grand mean:
+  To further the work by @Okada2013, it is first advantageous to explain the underlying assumptions and formulas used in this extension. While these formulas can be found in many introductory statistics textbooks covering ANOVA methods, we describe them below as well as provide *R* syntax online to aid in the reproducibility and understanding of the current extension. Population effect size is calculated by creating a sum of squares for between group differences from the grand mean:
   
 $$
 SS_{between} = \frac{\Sigma (\bar{X_{i}} - \bar{X})^2} {N_{groups}}
 $$
-and then estimating group error with an average of group variances. In this formula, $\bar{X_{i}}$ indicates each proposed group mean, while $\bar{X}$ is the proposed grand average of group means. Population eta is then calculated by creating a ratio of $SS_{between}$ and $SS_{error}$, analogous to the full $\eta^2$ formula:
+and then determining group error with an average of group variances. In this formula, $\bar{X_{i}}$ indicates each proposed group mean, while $\bar{X}$ is the proposed grand average of group means. Population eta is then calculated by creating a ratio of $SS_{between}$ and $SS_{error}$, analogous to the full $\eta^2$ formula:
 
 $$
 \eta^2_{pop} = \frac{SS_{between}} {SS_{between} + SS_{error}}.
@@ -97,7 +105,7 @@ and:
 $$
 RMSE = \sqrt\frac{\Sigma (\eta^2_{i} - \eta^2_{pop})^2} {N_{sims}}.
 $$
-Here, sample SD is calculated by squaring the difference between the estimated $\eta^2_{i}$ for each simulation from the mean $\bar{\eta^2}$ of that sample size. RMSE estimates the standard error by squaring the differences of estimated $\eta^2_{i}$ for each simulation from the $\eta^2_{pop}$. Both formulas use the population sample size estimator ($N_{sims}$) in the denominator, rather than degrees of freedom (i.e., $N_{sims}$ - 1). 
+Here, sample SD is calculated by squaring the difference between the estimated $\eta^2_{i}$ for each simulation from the mean $\bar{\eta^2}$ of that sample size. RMSE estimates the standard error by squaring the differences of estimated $\eta^2_{i}$ for each simulation from the $\eta^2_{pop}$. Both formulas use the population sample size estimator ($N_{sims}$) in the denominator, rather than degrees of freedom (i.e., $N_{sims}$ - 1). This formula is consistent with previous work by @Okada2013 and is appropriate for simulation studies (i.e., with large simulation numbers, results are consisent with *N* or *N*-1).
 
 ## Manipulated Variables
   Using the cited simulation code, we manipulated several factors independently to determine the effects of data type on bias, SD, and RMSE of variance overlap effect sizes. Methodologically, we examined the number of simulations first in *R*. For data types, we varied the number of decimals, type of means, and truncation/skew of the data. In all simulations testing these variables, we used the largest variability condition from @Okada2013 (i.e. means 0.0, 0.0, 1.2, 1.2) because it showed the largest bias, SD, and RMSE effects. Each simulation was tested across sample size values and effect size types found in @Okada2013. The *R* code from our study can be found at http://osf.io/urd8q in an *R* markdown file that shows the simulation and graph code inline with this manuscript.  
@@ -174,18 +182,7 @@ write.csv(fullrmse, "rmseCI.csv")
 write.csv(fullsd, "sdCI.csv")
 ```
   1,000 simulations per condition was used for this study. This option can be practical for researchers in terms of computation time, as results using 1,000 simulations are remarkably similar to @Okada2013. From one hundred iterations of 1,000 simulations, empirical 95% confidence intervals were calculated by taking the 2.5% and 97.5% values (i.e. values ranked 2 and 3 were averaged or values 97 and 98 were averaged). Confidence intervals are very small around average scores, indicating a reasonable range of values to be found. Graphs depicting this finding can be found online at http://osf.io/urd8q. The empirical confidence interval calculated here was used to determine how bias, SD, and RMSE changed across data type manipulations.
-```{r simulation-graph, eval=FALSE, include=FALSE, fig.cap="Replication of Okada (2013) bias, SD, and RMSE for the largest variability condition. Effect size values are presented for average simulations alongside Okada scores. Shaded gray area represents 95% confidence interval around these values.", fig.height=6, fig.width=6}
-
-##library source
-library(ggplot2)
-library(reshape)
-cleanup = theme(panel.grid.major = element_blank(), 
-                panel.grid.minor = element_blank(), 
-                panel.background = element_blank(), 
-                axis.line.x = element_line(color = "black"),
-                axis.line.y = element_line(color = "black"),
-                legend.key = element_rect(fill = "white"),
-                text = element_text(size = 13))
+```{r simulation-graph, include=FALSE, fig.cap="Replication of Okada (2013) bias, SD, and RMSE for the largest variability condition. Effect size values are presented for average simulations alongside Okada scores. Shaded gray area represents 95% confidence interval around these values.", fig.height=6, fig.width=6}
 
 ##import files
 biasci = read.csv("biasCI.csv")
@@ -518,7 +515,7 @@ write.csv(cbind(BIASmat, RMSEmat, SDmat), "rounding.csv")
 
   We also explored the effect of the type of dependent variable on bias, RMSE, and SD, starting with the precision of the dependent variable. *rnorm()* calculates random numbers to 16 decimal places. With computer assisted data collection, some phenomena may be calculated with more precision (i.e. more decimals), but it is unlikely that all data is collected with a large number of significant digits. Additionally, if researchers use Likert type data, it is possible that dependent variables may be captured in whole numbers. We simulated 1,000 datasets and within each round, we calculated bias, RMSE, and SD on the same data, rounding values from 0 to 15 decimals. After examining these data, only very small changes were apparent through one decimal (i.e. 1-15 decimals do not show differences larger than .001), and therefore, we only present results from rounding to the least precision, zero decimals. The complete dataset and code for both of these simulations are presented online at http://osf.io/urd8q. 
   
-```{r decimal-graph, echo=FALSE, fig.cap = "Bias, SD, and RMSE values of zero decimal dependent variables. Shaded gray area represents 95% confidence interval around these values.", fig.height=6, fig.width=6}
+```{r decimal-graph, echo=FALSE, fig.cap = "Bias, SD, and RMSE values of zero decimal dependent variables. Shaded gray area represents 95% confidence interval around these values.", fig.height=8, fig.width=8}
 round = read.csv("rounding.csv")
 
 ####bias graph####
@@ -534,7 +531,7 @@ biasline =
   ggplot(bgraphdatalong, aes(N, value, 
                              color = variable,
                              group = variable)) +
-  geom_line(size=.7) +
+  geom_line(size=.7, aes(linetype = variable)) +
   geom_ribbon(aes(ymin = LOCI, 
                   ymax = HICI, 
                   group = variable), 
@@ -547,7 +544,9 @@ biasline =
   geom_abline(slope = 0, intercept = 0) +
   scale_color_manual(name = "Effect Size", 
                      labels = c("Epsilon", "Eta", "Omega"),
-                     values = c("darkgrey", "black", "grey20")) +
+                     values = c("grey20", "grey20", "grey70")) +
+  scale_linetype(name = "Effect Size", 
+                 labels = c("Epsilon", "Eta", "Omega")) +
   cleanup
 
 ####rmse graph####
@@ -563,7 +562,7 @@ rmseline =
   ggplot(bgraphdatalong2, aes(N, value, 
                              color = variable,
                              group = variable)) +
-  geom_line(size=.7) +
+  geom_line(size=.7, aes(linetype = variable)) +
   geom_ribbon(aes(ymin = LOCI, 
                   ymax = HICI, 
                   group = variable), 
@@ -574,7 +573,11 @@ rmseline =
   ylab("RMSE") +
   xlab("Sample Size") + 
   geom_abline(slope = 0, intercept = 0) +
-  scale_color_manual(values = c("darkgrey", "black", "grey20")) +
+  scale_color_manual(name = "Effect Size", 
+                     labels = c("Epsilon", "Eta", "Omega"),
+                     values = c("grey20", "grey20", "grey70")) +
+  scale_linetype(name = "Effect Size", 
+                 labels = c("Epsilon", "Eta", "Omega")) +
   cleanup
 
 
@@ -591,7 +594,7 @@ sdline =
   ggplot(bgraphdatalong3, aes(N, value, 
                              color = variable,
                              group = variable)) +
-  geom_line(size=.7) +
+  geom_line(size=.7, aes(linetype = variable)) +
   geom_ribbon(aes(ymin = LOCI, 
                   ymax = HICI, 
                   group = variable), 
@@ -602,7 +605,11 @@ sdline =
   ylab("SD") +
   xlab("Sample Size") + 
   geom_abline(slope = 0, intercept = 0) +
-  scale_color_manual(values = c("darkgrey", "black", "grey20")) +
+  scale_color_manual(name = "Effect Size", 
+                     labels = c("Epsilon", "Eta", "Omega"),
+                     values = c("grey20", "grey20", "grey70")) +
+  scale_linetype(name = "Effect Size", 
+                 labels = c("Epsilon", "Eta", "Omega")) +
   cleanup
 
 # arrange plots together
@@ -629,7 +636,7 @@ bgraphdatalong3$outhi = bgraphdatalong3$value - bgraphdatalong3$HICI
 bgraphdatalong3$outlo = bgraphdatalong3$value - bgraphdatalong3$LOCI
 ```
 
-  As seen in Figure \@ref(fig:decimal-graph), rounding the dependent variable to zero decimals had a stark effect on the bias found in each of the effect sizes. All three were downwardly affected, that is, using less precise dependent variables resulted in less upwardly biased effect sizes. In fact, both $\omega^2$ and $\epsilon^2$ were completely negatively biased, and $\eta^2$ showed a negative bias after sample sizes approximately *n* = 40. These values average `r format(abs(avgbiaslo), nsmall = 3)` outside the comparison CI created in the first stage of this paper, which is traditionally considered a small effect size for variance overlap measures [@Cohen1992a]. RMSE values were increased for $\omega^2$ and $\epsilon^2$ across most *n* values over 50, averaging `r format(abs(avgrmsehi), nsmall = 3)` over the comparison CI. However, the SD for each effect size was unaffected by the rounding to whole numbers. We do not suggest that researchers should use less precise dependent variables; however, it is important to consider that effect size estimates from rounded data may be under-representing the size of their population effects.
+  As seen in Figure \@ref(fig:decimal-graph), rounding the dependent variable to zero decimals had a stark effect on the bias found in each of the effect sizes. All three were downwardly affected, that is, using less precise dependent variables resulted in less upwardly biased effect sizes. In fact, both $\omega^2$ and $\epsilon^2$ were completely negatively biased, and $\eta^2$ showed a negative bias after sample sizes approximately *n* = 40. These values average `r format(abs(avgbiaslo), nsmall = 3)` outside the comparison CI created in the first stage of this paper, which is traditionally considered a small effect size for variance overlap measures [@Cohen1992a]. RMSE values were increased outside the confidence interval for $\omega^2$ and $\epsilon^2$ across most *n* values over 50, averaging `r format(abs(avgrmsehi), nsmall = 3)` over the comparison CI. However, the SD for each effect size was unaffected by the rounding to whole numbers. Interested readers can view an interactive Shiny application on our OSF page. The Shiny app allows users to view figures in color, as well as manipulate the y-axis. Precise decimals are included with each figure, and while we report RMSE values here outside the CI created to examine changes, a reader can interpret these values with their own criteria online. With these results, we do not suggest that researchers should use less precise dependent variables; however, it is important to consider that effect size estimates from rounded data may be under-representing the size of their population effects and a bit more variable than expected.
 
 ## Type of Dependent Variable and Data Skew
   Given that Likert data is generally represented as whole numbers, we examined the effect of Likert type dependent variables may indirectly change effect sizes. Often, Likert scales are criticized for their non-normal distributions [@Bishop2015], where participants will choose only the ends of the scale. Therefore, in this set of simulations we first examined the effect of simply shifting the estimated sample means over to 2, 2, 3.2, and 3.2 to mimic a floor effect on a traditional 1-7 style scale. 1,000 simulations indicated no large differences from the comparison study (part one of this paper), and therefore, all data and graphs are presented online for the interested reader. After confirming that we did not see changes by shifting away from a standard normal distribution, we then simulated 1,000 datasets with adjusted means that were truncated. This procedure rounded all values less than one to one, and all values over seven down to seven. In each of these simulation tests, we only manipulated one variable, and therefore, the data in this test were otherwise not rounded (i.e. precision was set to default decimals). 
@@ -1445,7 +1452,7 @@ bias_across$Ndiff2not = as.numeric(bias_across$Nest2not) -
   as.numeric(bias_across$popNest) 
 ```
 
-```{r powerL-graph, echo=FALSE, fig.cap = "Sample size differences estimated for 80% power for found versus population effect sizes. Negative values indicate an underestimation of sample size needed to detect a significant effect. Circle size indicates population eta squared values, wherein small dots are small effect sizes and large dots are large effect sizes. The left panel indicates the full range of the data, while the right panel is zoomed in to show the effects at larger population values.", fig.height=6, fig.width=8}
+```{r powerL-graph, echo=FALSE, fig.cap = "Sample size differences estimated for 80% power for found versus population effect sizes. Negative values indicate an underestimation of sample size needed to detect a significant effect. Circle size indicates population eta squared values, wherein small dots are small effect sizes and large dots are large effect sizes. The left panel indicates the full range of the data, while the right panel is zoomed in to show the effects at larger population values.", fig.height=8, fig.width=8}
 
 ################### load in bias across L
 bias_acrossL <- read.csv("bias_acrossL.csv")
@@ -1539,10 +1546,8 @@ powerscatter2 =
 
 legend = get_legend(powerscatter2)
 powrow <- plot_grid( powerscatter + theme(legend.position="none"),
-                      powerscatter2 + theme(legend.position="none"),
-                      legend,
-                      hjust = -1,
-                      ncol = 3
+                      powerscatter2 + theme(legend.position=c(.50,.15)),
+                      hjust = -1
 )
 powrow
 

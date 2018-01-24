@@ -1,0 +1,76 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/decimal-graph-1.pdf}
+\caption{\label{fig:decimal-graph}Bias, SD, and RMSE values of zero decimal
+dependent variables. Shaded gray area represents 95\% confidence
+interval around these values.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/likerttrun-graph-1.pdf}
+\caption{\label{fig:likerttrun-graph}Bias, SD, and RMSE values for truncated
+Likert style dependent variables. Shaded gray area represents 95\%
+confidence interval around these values.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/across-graph-bias-1.pdf}
+\caption{\label{fig:across-graph-bias}Bias values for eta squared for
+regular and truncated Likert data (top and bottom) that has been not
+been rounded or rounded to whole numbers (left and right). Circle size
+indicates population eta squared values, wherein small dots are small
+effect sizes and large dots are large effect sizes.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/across-graph-rmse-1.pdf}
+\caption{\label{fig:across-graph-rmse}RMSE values for eta squared for
+regular and truncated Likert data (top and bottom) that has been not
+been rounded or rounded to whole numbers (left and right). Circle size
+indicates population eta squared values, wherein small dots are small
+effect sizes and large dots are large effect sizes.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/across-graph-sd-1.pdf}
+\caption{\label{fig:across-graph-sd}SD values for eta squared for regular
+and truncated Likert data (top and bottom) that has been not been
+rounded or rounded to whole numbers (left and right). Circle size
+indicates population eta squared values, wherein small dots are small
+effect sizes and large dots are large effect sizes.}
+\end{figure*}
+\efloatseparator
+ 
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{buchanan_scofield_version2_files/figure-latex/powerL-graph-1.pdf}
+\caption{\label{fig:powerL-graph}Sample size differences estimated for 80\%
+power for found versus population effect sizes. Negative values indicate
+an underestimation of sample size needed to detect a significant effect.
+Circle size indicates population eta squared values, wherein small dots
+are small effect sizes and large dots are large effect sizes. The left
+panel indicates the full range of the data, while the right panel is
+zoomed in to show the effects at larger population values.}
+\end{figure*}
+\efloatseparator
+ 
