@@ -24,6 +24,7 @@ abstract: >
   As effect sizes gain ground as important indicators of practical significance and as a meta-analytic tool, we must critically understand their limitations and biases. This project investigates the positive bias of eta squared and critical suggestions of the alternative use of omega squared or epsilon for their mitigation of bias. Variance overlap effect sizes were examined for potential bias in different data scenarios (i.e., truncated and Likert type data) to elucidate differences in bias from previous research. We found that data precision and truncation/skew affected effect size bias, often lowering the bias in eta squared. This work expands our understanding of bias on variance overlap measures and allows researchers to make an informed choice about the type of effect to report given aspects of their research study. Implications for sample size planning and power are also discussed.  
   
 keywords          : "bias, eta, omega, epsilon"
+wordcount         : 5648
 
 bibliography      : ["BiasOneRef.bib"]
 
